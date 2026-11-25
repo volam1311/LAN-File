@@ -14,6 +14,37 @@ Both devices use the browser they already have. Nothing else is installed, and t
 
 The page is `page.html`. Python fills in the shared address and the file list, then sends the page.
 
+## How it works
+
+`server.py` listens on port `8000`. A browser on the same Wi-Fi opens the printed address and sends one of three requests. Every file name is checked so the path stays inside `shared/`.
+
+```mermaid
+flowchart TD
+    start([Run python3 server.py]) --> listen["Listen on 0.0.0.0:8000 and print the LAN address"]
+    listen --> browser[Open that address in a browser]
+    browser --> route{Which request?}
+
+    route -->|GET /| list["List files in shared/, skip names starting with ."]
+    list --> page["Fill page.html with the address and the list, then send it"]
+
+    route -->|GET /download/name| getCheck{Name stays in shared/ and the file exists?}
+    getCheck -->|yes| send[Send the file as a download]
+    getCheck -->|no| missing[404 No such file]
+
+    route -->|POST /upload| size{Body is 50 MB or smaller?}
+    size -->|no| tooBig[413 File is too large]
+    size -->|yes| form{Form contains one file?}
+    form -->|no| noFile[400 No file in that upload]
+    form -->|yes| nameCheck{Name stays in shared/?}
+    nameCheck -->|no| badName[400 Name is not allowed]
+    nameCheck -->|yes| exists{A file with that name is already there?}
+    exists -->|yes| conflict[409 Already there]
+    exists -->|no| write[Write the file into shared/]
+    write --> redirect[303 Redirect back to /]
+```
+
+Anything else returns 404. A successful upload does not render a new page; the browser follows the redirect and loads the list again, with the new file on it.
+
 ## Requirements
 
 - Python 3.11 or newer

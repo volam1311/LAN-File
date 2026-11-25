@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAN files</title>
+<style>
+  body { font-family: sans-serif; margin: 1.5rem; line-height: 1.4; }
+  form { margin: 1rem 0 1.5rem; }
+  input, button { font-size: 1rem; }
+  button { padding: 0.6rem 1rem; }
+  li { margin: 0.4rem 0; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<h1>Shared files</h1>
+<p>Same link on this Mac and your phone: {{ADDRESS}}</p>
+<form method="post" action="/upload" enctype="multipart/form-data">
+  <input type="file" name="file" required>
+  <button type="submit">Upload</button>
+</form>
+<ul>
+{{ITEMS}}
+</ul>
+</body>
+</html>
